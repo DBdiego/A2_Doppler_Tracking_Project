@@ -4,6 +4,10 @@ function [A] = noise_reduction(A)
     max_gap_h = 110;
     min_points_v = 5;
     max_gap_v = 25;
+    num_steps_row = 10.0;
+    num_steps_col = 50.0; 
+    allowed_color = 1/100;
+    
     for i = 1:r
         indices = find(A(i,:)==1);
         if length(indices) > 1
@@ -88,6 +92,37 @@ function [A] = noise_reduction(A)
            end
         end
     end
-
+   
+    
+    step_size_row = floor(r./num_steps_row);
+    step_size_col = floor(c./num_steps_col);
+    eval_size = step_size_row * step_size_col;
+    
+    for i = 1:num_steps_row
+        start_row = ((i - 1) * step_size_row)+1;
+        end_row = i * step_size_row;
+        
+        for j = 1:num_steps_col
+            start_col = ((j-1) * step_size_col)+1;
+            end_col = j * step_size_col;
+            
+            evaluated_m = A(start_row:end_row , start_col:end_col);
+            average_color = sum(evaluated_m(:))./(eval_size);
+           
+            if average_color < allowed_color
+                evaluated_m = zeros(round(step_size_row),round(step_size_col));
+                A(start_row:end_row , start_col:end_col) = evaluated_m;
+            end
+        end
+    end
+    
 end
+
+
+
+
+
+
+
+
 
